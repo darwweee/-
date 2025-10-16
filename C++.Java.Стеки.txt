@@ -1,0 +1,218 @@
+C++ | Стеки
+
+1. Дана строка 'AaBbCcDd'. Используя стек получите две строки: только с заглавными и только со
+строчными буквами. Выведите их на экран.
+
+#include <iostream>
+#include <stack>
+#include <string>
+
+using namespace std;
+
+int main() {
+    // Исходная строка
+    string input = "AaBbCcDd";
+    
+    // Создаем стек для хранения символов
+    stack<char> charStack;
+    
+    // Проходим по всем символам исходной строки
+    for (char c : input) {
+        charStack.push(c); // Помещаем каждый символ в стек
+    }
+    
+    // Строки для хранения результатов
+    string uppercase = "";
+    string lowercase = "";
+    
+    // Извлекаем символы из стека
+    while (!charStack.empty()) {
+        char current = charStack.top();
+        charStack.pop();
+        
+        // Проверяем регистр символа и добавляем в соответствующую строку
+        if (isupper(current)) {
+            uppercase += current;
+        } else if (islower(current)) {
+            lowercase += current;
+        }
+    }
+    
+    // Выводим результаты
+    cout << "Строка с заглавными буквами: " << uppercase << endl;
+    cout << "Строка со строчными буквами: " << lowercase << endl;
+    
+    return 0;
+}
+
+
+2. Дан список ['a', '1', 'b', '2', 'c', '3']. С помощью стека разбейте его на два списка: только с буквами и только с числами. Сам список
+затем удалите, а новые списки выведите на экран, каждый на отдельной строке.
+
+#include <iostream>
+#include <stack>
+#include <vector>
+#include <cctype> // для функции isdigit()
+
+using namespace std;
+
+int main() {
+    // Создаем исходный список
+    vector<string> originalList = {"a", "1", "b", "2", "c", "3"};
+    
+    // Создаем стеки для хранения букв и цифр
+    stack<string> lettersStack;
+    stack<string> numbersStack;
+    
+    // Проходим по всем элементам исходного списка
+    for (const string& item : originalList) {
+        // Проверяем, является ли элемент цифрой
+        if (isdigit(item[0])) {
+            numbersStack.push(item);
+        } else {
+            lettersStack.push(item);
+        }
+    }
+    
+    // Очищаем исходный список
+    originalList.clear();
+    
+    // Создаем векторы для хранения результатов
+    vector<string> letters;
+    vector<string> numbers;
+    
+    // Извлекаем элементы из стека букв
+    while (!lettersStack.empty()) {
+        letters.push_back(lettersStack.top());
+        lettersStack.pop();
+    }
+    
+    // Извлекаем элементы из стека цифр
+    while (!numbersStack.empty()) {
+        numbers.push_back(numbersStack.top());
+        numbersStack.pop();
+    }
+    
+    // Выводим результат
+    cout << "Список букв: ";
+    for (const string& letter : letters) {
+        cout << letter << " ";
+    }
+    cout << endl;
+    
+    cout << "Список чисел: ";
+    for (const string& number : number) {
+        cout << number << " ";
+    }
+    cout << endl;
+    
+    return 0;
+}
+
+
+Java | Стеки
+
+1. Дана строка 'AaBbCcDd'. Используя стек получите две строки: только с заглавными и только со
+строчными буквами. Выведите их на экран.
+
+import java.util.Stack;
+
+public class Main {
+    public static void main(String[] args) {
+        // Исходная строка
+        String input = "AaBbCcDd";
+        
+        // Создаем два стека для хранения букв
+        Stack<Character> uppercaseStack = new Stack<>();
+        Stack<Character> lowercaseStack = new Stack<>();
+        
+        // Проходим по каждому символу в строке
+        for (char c : input.toCharArray()) {
+            // Проверяем, является ли символ заглавной буквой
+            if (Character.isUpperCase(c)) {
+                uppercaseStack.push(c);
+            }
+            // Проверяем, является ли символ строчной буквой
+            else if (Character.isLowerCase(c)) {
+                lowercaseStack.push(c);
+            }
+        }
+        
+        // Формируем строки из стеков
+        StringBuilder uppercaseString = new StringBuilder();
+        StringBuilder lowercaseString = new StringBuilder();
+        
+        // Собираем заглавные буквы в обратном порядке
+        while (!uppercaseStack.isEmpty()) {
+            uppercaseString.append(uppercaseStack.pop());
+        }
+        
+        // Собираем строчные буквы в обратном порядке
+        while (!lowercaseStack.isEmpty()) {
+            lowercaseString.append(lowercaseStack.pop());
+        }
+        
+        // Выводим результаты
+        System.out.println("Строка с заглавными буквами: " + uppercaseString.toString());
+        System.out.println("Строка со строчными буквами: " + lowercaseString.toString());
+    }
+}
+
+
+2. Дан список ['a', '1', 'b', '2', 'c', '3']. С помощью стека разбейте его на два списка: только с буквами и только с числами. Сам список
+затем удалите, а новые списки выведите на экран, каждый на отдельной строке.
+
+import java.util.Stack;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        // Создаем исходный список
+        List<String> originalList = new ArrayList<>();
+        originalList.add("a");
+        originalList.add("1");
+        originalList.add("b");
+        originalList.add("2");
+        originalList.add("c");
+        originalList.add("3");
+        
+        // Создаем два стека для хранения элементов
+        Stack<String> lettersStack = new Stack<>();
+        Stack<String> numbersStack = new Stack<>();
+        
+        // Проходим по каждому элементу исходного списка
+        for (String element : originalList) {
+            // Проверяем, является ли элемент буквой
+            if (Character.isLetter(element.charAt(0))) {
+                lettersStack.push(element);
+            }
+            // Проверяем, является ли элемент числом
+            else if (Character.isDigit(element.charAt(0))) {
+                numbersStack.push(element);
+            }
+        }
+        
+        // Очищаем исходный список
+        originalList.clear();
+        
+        // Формируем списки из стеков
+        List<String> lettersList = new ArrayList<>();
+        List<String> numbersList = new ArrayList<>();
+        
+        // Собираем буквы в обратном порядке
+        while (!lettersStack.isEmpty()) {
+            lettersList.add(lettersStack.pop());
+        }
+        
+        // Собираем числа в обратном порядке
+        while (!numbersStack.isEmpty()) {
+            numbersList.add(numbersStack.pop());
+        }
+        
+        // Выводим результаты
+        System.out.println("Список букв: " + lettersList);
+        System.out.println("Список чисел: " + numbersList);
+    }
+}
+
