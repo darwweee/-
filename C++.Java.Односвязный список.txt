@@ -1,0 +1,356 @@
+C++ | Односвязный список
+
+1. Дана строка 'AaBbCcDd'. Используя односвязный список получите две строки: только с заглавными и только со
+строчными буквами. Выведите их на экран.
+
+#include <iostream>
+#include <string>
+
+// Определение структуры узла односвязного списка
+struct Node {
+    char data;
+    Node* next;
+    
+    Node(char value) : data(value), next(nullptr) {}
+};
+
+// Класс для работы со списком
+class LinkedList {
+private:
+    Node* head;
+    
+public:
+    LinkedList() : head(nullptr) {}
+    
+    // Добавление элемента в конец списка
+    void append(char value) {
+        if (!head) {
+            head = new Node(value);
+            return;
+        }
+        
+        Node* current = head;
+        while (current->next) {
+            current = current->next;
+        }
+        current->next = new Node(value);
+    }
+    
+    // Получение строк с заглавными и строчными буквами
+    std::pair<std::string, std::string> getStrings() {
+        std::string upper = "";
+        std::string lower = "";
+        
+        Node* current = head;
+        while (current) {
+            if (isupper(current->data)) {
+                upper += current->data;
+            } else if (islower(current->data)) {
+                lower += current->data;
+            }
+            current = current->next;
+        }
+        
+        return {upper, lower};
+    }
+    
+    // Деструктор для очистки памяти
+    ~LinkedList() {
+        Node* current = head;
+        while (current) {
+            Node* next = current->next;
+            delete current;
+            current = next;
+        }
+    }
+};
+
+int main() {
+    // Исходная строка
+    std::string input = "AaBbCcDd";
+    
+    // Создаем список и заполняем его
+    LinkedList list;
+    for (char c : input) {
+        list.append(c);
+    }
+    
+    // Получаем строки
+    auto [upper, lower] = list.getStrings();
+    
+    // Выводим результат
+    std::cout << "Строка с заглавными буквами: " << upper << std::endl;
+    std::cout << "Строка со строчными буквами: " << lower << std::endl;
+    
+    return 0;
+}
+
+
+2. Дан список ['a', '1', 'b', '2', 'c', '3']. С помощью односвязного списка разбейте его на два списка: только с буквами и только с числами. Сам список затем удалите, а новые списки выведите на экран, каждый на отдельной строке.
+
+#include <iostream>
+#include <cctype>
+
+// Структура узла односвязного списка
+struct Node {
+    char data;
+    Node* next;
+    
+    Node(char value) : data(value), next(nullptr) {}
+};
+
+// Класс для работы со списком
+class LinkedList {
+private:
+    Node* head;
+    
+public:
+    LinkedList() : head(nullptr) {}
+    
+    // Добавление элемента в конец списка
+    void append(char value) {
+        if (!head) {
+            head = new Node(value);
+            return;
+        }
+        
+        Node* current = head;
+        while (current->next) {
+            current = current->next;
+        }
+        current->next = new Node(value);
+    }
+    
+    // Разделение списка на два
+    std::pair<LinkedList, LinkedList> splitList() {
+        LinkedList letters;
+        LinkedList numbers;
+        
+        Node* current = head;
+        while (current) {
+            if (isalpha(current->data)) {
+                letters.append(current->data);
+            }
+            else if (isdigit(current->data)) {
+                numbers.append(current->data);
+            }
+            current = current->next;
+        }
+        
+        // Очищаем исходный список
+        clear();
+        
+        return {letters, numbers};
+    }
+    
+    // Вывод списка
+    void print() const {
+        Node* current = head;
+        while (current) {
+            std::cout << current->data << " ";
+            current = current->next;
+        }
+        std::cout << std::endl;
+    }
+    
+    // Очистка памяти
+    ~LinkedList() {
+        Node* current = head;
+        while (current) {
+            Node* next = current->next;
+            delete current;
+            current = next;
+        }
+    }
+    
+private:
+    void clear() {
+        head = nullptr;
+    }
+};
+
+int main() {
+    // Создаем исходный список
+    LinkedList originalList;
+    originalList.append('a');
+    originalList.append('1');
+    originalList.append('b');
+    originalList.append('2');
+    originalList.append('c');
+    originalList.append('3');
+    
+    // Разделяем список
+    auto [lettersList, numbersList] = originalList.splitList();
+    
+    // Выводим результаты
+    std::cout << "Список с буквами: ";
+    lettersList.print();
+    
+    std::cout << "Список с числами: ";
+    numbersList.print();
+    
+    return 0;
+}
+
+
+Java | Односвязный список
+
+1. Дана строка 'AaBbCcDd'. Используя односвязный список получите две строки: только с заглавными и только со
+строчными буквами. Выведите их на экран.
+
+// Класс узла односвязного списка
+class Node {
+    char data;    // Храним символ
+    Node next;    // Ссылка на следующий узел
+    
+    // Конструктор узла
+    Node(char data) {
+        this.data = data;
+        this.next = null;
+    }
+}
+
+// Класс односвязного списка
+class LinkedList {
+    Node head;    // Голова списка
+    
+    // Добавление элемента в конец списка
+    public void append(char data) {
+        if (head == null) {
+            head = new Node(data);
+            return;
+        }
+        
+        Node current = head;
+        while (current.next != null) {
+            current = current.next;
+        }
+        current.next = new Node(data);
+    }
+    
+    // Получение строк с заглавными и строчными буквами
+    public String[] getStrings() {
+        StringBuilder upper = new StringBuilder();  // Для заглавных
+        StringBuilder lower = new StringBuilder();  // Для строчных
+        
+        Node current = head;
+        while (current != null) {
+            if (Character.isUpperCase(current.data)) {
+                upper.append(current.data);
+            } else if (Character.isLowerCase(current.data)) {
+                lower.append(current.data);
+            }
+            current = current.next;
+        }
+        
+        return new String[] { upper.toString(), lower.toString() };
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        String input = "AaBbCcDd";
+        LinkedList list = new LinkedList();
+        
+        // Заполняем список символами из строки
+        for (char c : input.toCharArray()) {
+            list.append(c);
+        }
+        
+        // Получаем результат
+        String[] result = list.getStrings();
+        
+        // Выводим результат
+        System.out.println("Заглавные буквы: " + result[0]);
+        System.out.println("Строчные буквы: " + result[1]);
+    }
+}
+
+
+2. Дан список ['a', '1', 'b', '2', 'c', '3']. С помощью односвязного списка разбейте его на два списка: только с буквами и только с числами. Сам список затем удалите, а новые списки выведите на экран, каждый на отдельной строке.
+
+// Класс узла односвязного списка
+class Node {
+    String data;  // Храним строку
+    Node next;    // Ссылка на следующий узел
+    
+    // Конструктор узла
+    Node(String data) {
+        this.data = data;
+        this.next = null;
+    }
+}
+
+// Класс односвязного списка
+class LinkedList {
+    Node head;    // Голова списка
+    
+    // Добавление элемента в конец списка
+    public void append(String data) {
+        if (head == null) {
+            head = new Node(data);
+            return;
+        }
+        
+        Node current = head;
+        while (current.next != null) {
+            current = current.next;
+        }
+        current.next = new Node(data);
+    }
+    
+    // Разделение списка на два
+    public void splitList() {
+        LinkedList letters = new LinkedList();  // Для букв
+        LinkedList numbers = new LinkedList();  // Для чисел
+        
+        Node current = head;
+        while (current != null) {
+            try {
+                // Пытаемся преобразовать в число
+                Integer.parseInt(current.data);
+                numbers.append(current.data);
+            } catch (NumberFormatException e) {
+                // Если не число - значит буква
+                letters.append(current.data);
+            }
+            current = current.next;
+        }
+        
+        // Очищаем исходный список
+        head = null;
+        
+        // Выводим результаты
+        System.out.print("Буквы: ");
+        printList(letters);
+        
+        System.out.print("Числа: ");
+        printList(numbers);
+    }
+    
+    // Вывод списка
+    private void printList(LinkedList list) {
+        Node current = list.head;
+        while (current != null) {
+            System.out.print(current.data + " ");
+            current = current.next;
+        }
+        System.out.println();
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        LinkedList list = new LinkedList();
+        
+        // Заполняем исходный список
+        String[] input = {"a", "1", "b", "2", "c", "3"};
+        for (String s : input) {
+            list.append(s);
+        }
+        
+        // Разделяем и выводим результат
+        list.splitList();
+    }
+}
+
