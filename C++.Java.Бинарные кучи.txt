@@ -1,0 +1,505 @@
+C++ | Бинарные кучи
+
+1 пример кода для реализации бинарной кучи на C++: реализация кучи с минимального элементом в корне
+
+#include <iostream>
+#include <vector>
+
+class MinHeap {
+private:
+    std::vector<int> heap;  // Массив для хранения элементов кучи
+    
+    // Восстанавливает свойство кучи после добавления элемента
+    void heapifyUp(int index) {
+        int parent = (index - 1) / 2;
+        if (index > 0 && heap[index] < heap[parent]) {
+            std::swap(heap[index], heap[parent]);
+            heapifyUp(parent);
+        }
+    }
+    
+    // Восстанавливает свойство кучи после удаления элемента
+    void heapifyDown(int index) {
+        int left = 2 * index + 1;
+        int right = 2 * index + 2;
+        int smallest = index;
+        
+        if (left < heap.size() && heap[left] < heap[smallest])
+            smallest = left;
+            
+        if (right < heap.size() && heap[right] < heap[smallest])
+            smallest = right;
+            
+        if (smallest != index) {
+            std::swap(heap[index], heap[smallest]);
+            heapifyDown(smallest);
+        }
+    }
+    
+public:
+    // Добавление элемента в кучу
+    void insert(int value) {
+        heap.push_back(value);
+        heapifyUp(heap.size() - 1);
+    }
+    
+    // Удаление минимального элемента
+    int extractMin() {
+        if (heap.empty()) {
+            throw std::out_of_range("Heap is empty");
+        }
+        
+        int min = heap[0];
+        heap[0] = heap.back();
+        heap.pop_back();
+        heapifyDown(0);
+        return min;
+    }
+    
+    // Получение минимального элемента без удаления
+    int getMin() const {
+        if (heap.empty()) {
+            throw std::out_of_range("Heap is empty");
+        }
+        return heap[0];
+    }
+    
+    // Проверка на пустоту
+    bool isEmpty() const {
+        return heap.empty();
+    }
+    
+    // Получение размера кучи
+    size_t size() const {
+        return heap.size();
+    }
+};
+
+int main() {
+    MinHeap heap;
+    
+    // Добавление элементов
+    heap.insert(10);
+    heap.insert(5);
+    heap.insert(3);
+    heap.insert(2);
+    heap.insert(7);
+    
+    std::cout << "Куча после вставки элементов: ";
+    heap.printHeap();
+
+    // Получение минимального элемента
+    std::cout << "Минимальный элемент: " << heap.getMin() << std::endl;
+    
+    // Извлечение минимального элемента
+    std::cout << "Извлечен элемент: " << heap.extractMin() << std::endl;
+    
+    // Проверка размера
+    std::cout << "Размер кучи: " << heap.size() << std::endl;
+    
+    return 0;
+}
+
+2 пример кода для реализации бинарной кучи на C++: реализация кучи с максимальным элементом в корне
+
+#include <iostream>
+#include <vector>
+#include <algorithm> // для std::swap
+
+class MaxHeap {
+private:
+    std::vector<int> heap;
+    size_t heapSize;
+
+    // Восстановление свойства кучи после вставки
+    void heapifyUp(size_t index) {
+        while (index > 0 && heap[index] > heap[parent(index)]) {
+            std::swap(heap[index], heap[parent(index)]);
+            index = parent(index);
+        }
+    }
+
+    // Восстановление свойства кучи после удаления
+    void heapifyDown(size_t index) {
+        size_t largest = index;
+        size_t left = leftChild(index);
+        size_t right = rightChild(index);
+
+        if (left < heapSize && heap[left] > heap[largest])
+            largest = left;
+
+        if (right < heapSize && heap[right] > heap[largest])
+            largest = right;
+
+        if (largest != index) {
+            std::swap(heap[index], heap[largest]);
+            heapifyDown(largest);
+        }
+    }
+
+    // Вспомогательные функции для работы с индексами
+    size_t parent(size_t index) { return (index - 1) / 2; }
+    size_t leftChild(size_t index) { return 2 * index + 1; }
+    size_t rightChild(size_t index) { return 2 * index + 2; }
+
+public:
+    MaxHeap() : heapSize(0) {}
+
+    // Добавление элемента в кучу
+    void insert(int value) {
+        if (heap.size() == heapSize)
+            heap.push_back(value);
+        else
+            heap[heapSize] = value;
+        
+        heapSize++;
+        heapifyUp(heapSize - 1);
+    }
+
+    // Удаление максимального элемента
+    int extractMax() {
+        if (heapSize == 0)
+            throw std::out_of_range("Heap is empty");
+
+        int max = heap[0];
+        heap[0] = heap[heapSize - 1];
+        heapSize--;
+        heapifyDown(0);
+        return max;
+    }
+
+    // Получение максимального элемента без удаления
+    int getMax() const {
+        if (heapSize == 0)
+            throw std::out_of_range("Heap is empty");
+        return heap[0];
+    }
+
+    // Удаление элемента по индексу
+    void remove(size_t index) {
+        if (index >= heapSize)
+            throw std::out_of_range("Index out of range");
+
+        heap[index] = std::numeric_limits<int>::max();
+        heapifyUp(index);
+        extractMax();
+    }
+
+    // Обновление значения элемента
+    void update(size_t index, int newValue) {
+        if (index >= heapSize)
+            throw std::out_of_range("Index out of range");
+
+        int oldValue = heap[index];
+        heap[index] = newValue;
+
+        if (newValue > oldValue)
+            heapifyUp(index);
+        else
+            heapifyDown(index);
+    }
+
+    // Проверка на пустоту
+    bool isEmpty() const { return heapSize == 0; }
+
+    // Получение размера кучи
+    size_t getSize() const { return heapSize; }
+
+    // Вывод элементов кучи
+    void printHeap() const {
+        for (size_t i = 0; i < heapSize; i++)
+            std::cout << heap[i] << " ";
+        std::cout << std::endl;
+    }
+};
+
+int main() {
+    MaxHeap heap;
+
+    // Добавление элементов
+    heap.insert(10);
+    heap.insert(20);
+    heap.insert(15);
+    heap.insert(30);
+    heap.insert(40);
+
+    std::cout << "Куча после вставки элементов: ";
+    heap.printHeap();
+
+    // Получение максимального элемента
+    std::cout << "Максимальный элемент: " << heap.getMax() << std::endl;
+    
+    // Извлечение максимального элемента
+    std::cout << "Извлечен элемент: " << heap.extractMax() << std::endl;
+    
+    // Проверка размера
+    std::cout << "Размер кучи: " << heap.size() << std::endl;
+    
+    return 0;
+}
+
+
+Java | Бинарные кучи
+
+1 пример кода для реализации бинарной кучи на Java: реализация кучи с минимального элементом в корне
+
+public class MinHeap {
+    private int[] heap;
+    private int size;
+    private int maxSize;
+
+    // Конструктор кучи
+    public MinHeap(int maxSize) {
+        this.maxSize = maxSize;
+        this.size = 0;
+        heap = new int[maxSize];
+    }
+
+    // Возвращает индекс родительского элемента
+    private int parent(int pos) {
+        return (pos - 1) / 2;
+    }
+
+    // Возвращает индекс левого потомка
+    private int leftChild(int pos) {
+        return (2 * pos) + 1;
+    }
+
+    // Возвращает индекс правого потомка
+    private int rightChild(int pos) {
+        return (2 * pos) + 2;
+    }
+
+    // Проверка, является ли узел листом
+    private boolean isLeaf(int pos) {
+        return pos >= (size / 2) && pos < size;
+    }
+
+    // Просеивание вверх
+    private void heapifyUp(int pos) {
+        int current = pos;
+        while (current > 0 && heap[parent(current)] > heap[current]) {
+            // Обмен элементов
+            int temp = heap[current];
+            heap[current] = heap[parent(current)];
+            heap[parent(current)] = temp;
+            current = parent(current);
+        }
+    }
+
+    // Просеивание вниз
+    private void heapifyDown(int pos) {
+        if (!isLeaf(pos)) {
+            int smallest = pos;
+            int left = leftChild(pos);
+            int right = rightChild(pos);
+
+            if (left < size && heap[left] < heap[smallest]) {
+                smallest = left;
+            }
+            if (right < size && heap[right] < heap[smallest]) {
+                smallest = right;
+            }
+            if (smallest != pos) {
+                // Обмен элементов
+                int temp = heap[pos];
+                heap[pos] = heap[smallest];
+                heap[smallest] = temp;
+                heapifyDown(smallest);
+            }
+        }
+    }
+
+    // Вставка элемента
+    public void insert(int element) {
+        if (size >= maxSize) {
+            return;
+        }
+        heap[size] = element;
+        heapifyUp(size);
+        size++;
+    }
+
+    // Удаление минимального элемента
+    public int remove() {
+        if (size == 0) {
+            return -1; // Куча пуста
+        }
+        int popped = heap[0];
+        heap[0] = heap[size - 1];
+        size--;
+        heapifyDown(0);
+        return popped;
+    }
+
+    // Печать элементов кучи
+    public void print() {
+        for (int i = 0; i < size / 2; i++) {
+            System.out.print("Parent: " + heap[i]);
+            System.out.print(" Left child: " + heap[2 * i + 1]);
+            System.out.println(" Right child: " + heap[2 * i + 2]);
+        }
+    }
+}
+
+// Пример использования
+public class Main {
+    public static void main(String[] args) {
+        MinHeap heap = new MinHeap(15);
+        heap.insert(3);
+        heap.insert(5);
+        heap.insert(1);
+        heap.insert(4);
+        heap.insert(2);
+        
+        System.out.println("Куча после вставки элементов:");
+        heap.print();
+        
+	//Получение минимального элемента
+        System.out.println("Минимальный элемент: " + maxHeap.peek());
+        
+	//Удалени минимального элемента
+        System.out.println("Удаляем минимальный элемент: " + maxHeap.remove());
+
+        System.out.println("Куча после удаления:");
+        maxHeap.print();
+    }
+}
+
+
+2 пример кода для реализации бинарной кучи на C++: реализация кучи с максимальным элементом в корне
+
+public class MaxHeap {
+    private int[] heap;
+    private int size;
+    private int capacity;
+
+    // Конструктор кучи с заданным максимальным размером
+    public MaxHeap(int capacity) {
+        this.capacity = capacity;
+        this.size = 0;
+        heap = new int[capacity];
+    }
+
+    // Возвращает индекс родительского элемента
+    private int parent(int pos) {
+        return (pos - 1) / 2;
+    }
+
+    // Возвращает индекс левого потомка
+    private int leftChild(int pos) {
+        return 2 * pos + 1;
+    }
+
+    // Возвращает индекс правого потомка
+    private int rightChild(int pos) {
+        return 2 * pos + 2;
+    }
+
+    // Проверка, является ли узел листом
+    private boolean isLeaf(int pos) {
+        return pos >= (size / 2) && pos < size;
+    }
+
+    // Метод для обмена двух узлов
+    private void swap(int fpos, int spos) {
+        int temp = heap[fpos];
+        heap[fpos] = heap[spos];
+        heap[spos] = temp;
+    }
+
+    // Просеивание вверх (Heapify Up)
+    private void heapifyUp(int pos) {
+        while (pos > 0 && heap[parent(pos)] < heap[pos]) {
+            swap(pos, parent(pos));
+            pos = parent(pos);
+        }
+    }
+
+    // Просеивание вниз (Heapify Down)
+    private void heapifyDown(int pos) {
+        if (!isLeaf(pos)) {
+            int left = leftChild(pos);
+            int right = rightChild(pos);
+            int largest = pos;
+
+            if (left < size && heap[left] > heap[largest]) {
+                largest = left;
+            }
+
+            if (right < size && heap[right] > heap[largest]) {
+                largest = right;
+            }
+
+            if (largest != pos) {
+                swap(pos, largest);
+                heapifyDown(largest);
+            }
+        }
+    }
+
+    // Вставка элемента в кучу
+    public void insert(int element) {
+        if (size >= capacity) {
+            throw new IllegalStateException("Куча переполнена");
+        }
+        heap[size] = element;
+        heapifyUp(size);
+        size++;
+    }
+
+    // Удаление максимального элемента
+    public int remove() {
+        if (size == 0) {
+            throw new IllegalStateException("Куча пуста");
+        }
+        int popped = heap[0];
+        heap[0] = heap[size - 1];
+        size--;
+        heapifyDown(0);
+        return popped;
+    }
+
+    // Получение максимального элемента без удаления
+    public int peek() {
+        if (size == 0) {
+            throw new IllegalStateException("Куча пуста");
+        }
+        return heap[0];
+    }
+
+    // Печать элементов кучи
+    public void print() {
+        System.out.print("Куча: ");
+        for (int i = 0; i < size; i++) {
+            System.out.print(heap[i] + " ");
+        }
+        System.out.println();
+    }
+}
+
+// Пример использования
+public class Main {
+    public static void main(String[] args) {
+        MaxHeap maxHeap = new MaxHeap(15);
+        
+        maxHeap.insert(3);
+        maxHeap.insert(5);
+        maxHeap.insert(9);
+        maxHeap.insert(6);
+        maxHeap.insert(8);
+        maxHeap.insert(20);
+        
+        System.out.println("Куча после вставки элементов:");
+        maxHeap.print();
+        
+	//Получение максимального элемента
+        System.out.println("Максимальный элемент: " + maxHeap.peek());
+        
+	//Удалени максимального элемента
+        System.out.println("Удаляем максимальный элемент: " + maxHeap.remove());
+
+        System.out.println("Куча после удаления:");
+        maxHeap.print();
+    }
+}
