@@ -1,0 +1,144 @@
+C++ | Алгоритм коммивояжера
+
+Пример кода для реализации алгоритма коммивояжера с использованием метода полного перебора
+
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <climits>
+
+using namespace std;
+
+// Функция для вычисления длины пути
+int calculatePath(const vector<vector<int>>& graph, const vector<int>& path) {
+    int cost = 0;
+    int n = path.size();
+    
+    // Суммируем расстояния между последовательными городами
+    for (int i = 0; i < n - 1; i++) {
+        cost += graph[path[i]][path[i + 1]];
+    }
+    // Добавляем расстояние от последнего города до первого
+    cost += graph[path[n - 1]][path[0]];
+    
+    return cost;
+}
+
+// Функция для поиска оптимального пути
+void findShortestPath(const vector<vector<int>>& graph) {
+    int n = graph.size();
+    vector<int> path(n);
+    
+    // Создаем начальный путь (0, 1, 2, ..., n-1)
+    for (int i = 0; i < n; i++) {
+        path[i] = i;
+    }
+    
+    int minCost = INT_MAX;
+    vector<int> bestPath = path;
+    
+    // Перебираем все возможные перестановки
+    do {
+        int currentCost = calculatePath(graph, path);
+        if (currentCost < minCost) {
+            minCost = currentCost;
+            bestPath = path;
+        }
+    } while (next_permutation(path.begin() + 1, path.end()));
+    
+    // Выводим результат
+    cout << "Оптимальный путь: ";
+    for (int city : bestPath) {
+        cout << city << " ";
+    }
+    cout << "\nМинимальная стоимость: " << minCost << endl;
+}
+
+int main() {
+    // Пример матрицы расстояний (граф)
+    vector<vector<int>> graph = {
+        {0, 10, 15, 20},
+        {10, 0, 35, 25},
+        {15, 35, 0, 30},
+        {20, 25, 30, 0}
+    };
+    
+    findShortestPath(graph);
+    
+    return 0;
+}
+
+
+Java | Алгоритм коммивояжера
+
+Пример кода для реализации алгоритма коммивояжера с использованием метода полного перебора
+
+public class TravelingSalesman {
+    // Матрица расстояний между городами
+    private int[][] distanceMatrix;
+    private int numCities;
+    private int minCost = Integer.MAX_VALUE;
+    private int[] bestPath;
+
+    public TravelingSalesman(int[][] matrix) {
+        this.distanceMatrix = matrix;
+        this.numCities = matrix.length;
+        this.bestPath = new int[numCities];
+    }
+
+    // Рекурсивная функция для поиска оптимального пути
+    private void findShortestPath(int[] path, boolean[] visited, int currentCost, int position) {
+        // Если все города посещены, проверяем стоимость пути
+        if (position == numCities) {
+            // Добавляем расстояние от последнего города до первого
+            currentCost += distanceMatrix[path[position - 1]][path[0]];
+            if (currentCost < minCost) {
+                minCost = currentCost;
+                System.arraycopy(path, 0, bestPath, 0, numCities);
+            }
+            return;
+        }
+
+        // Перебираем все города
+        for (int city = 0; city < numCities; city++) {
+            if (!visited[city]) {
+                visited[city] = true;
+                path[position] = city;
+                findShortestPath(path, visited, currentCost + distanceMatrix[path[position - 1]][city], position + 1);
+                visited[city] = false;
+            }
+        }
+    }
+
+    public void solve() {
+        int[] path = new int[numCities];
+        boolean[] visited = new boolean[numCities];
+        visited[0] = true;
+        path[0] = 0;
+        findShortestPath(path, visited, 0, 1);
+    }
+
+    public void printSolution() {
+        System.out.print("Оптимальный путь: ");
+        for (int city : bestPath) {
+            System.out.print(city + " ");
+        }
+        System.out.println("\nМинимальная стоимость: " + minCost);
+    }
+
+    public static void main(String[] args) {
+        // Пример матрицы расстояний
+        int[][] distanceMatrix = {
+            {0, 10, 15, 20},
+            {10, 0, 35, 25},
+            {15, 35, 0, 30},
+            {20, 25, 30, 0}
+        };
+
+        TravelingSalesman tsp = new TravelingSalesman(distanceMatrix);
+        tsp.solve();
+        tsp.printSolution();
+    }
+}
+
+
