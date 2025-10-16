@@ -1,0 +1,374 @@
+C++ | Бинарные кучи
+
+1 пример кода для реализации графов (с использованием списка смежности)
+
+#include <iostream>
+#include <vector>
+#include <list>
+
+using namespace std;
+
+// Класс для представления графа
+class Graph {
+private:
+    int V;    // Количество вершин
+    vector<list<int>> adj;    // Список смежности
+
+public:
+    // Конструктор
+    Graph(int V);
+    
+    // Добавление ребра в граф
+    void addEdge(int v, int w);
+    
+    // Обход в глубину (DFS)
+    void DFS(int v);
+    
+    // Обход в ширину (BFS)
+    void BFS(int v);
+};
+
+// Конструктор
+Graph::Graph(int V) {
+    this->V = V;
+    adj.resize(V);
+}
+
+// Добавление ребра
+void Graph::addEdge(int v, int w) {
+    adj[v].push_back(w);    // Добавление w в список v
+}
+
+// DFS
+void Graph::DFS(int v) {
+    vector<bool> visited(V, false);
+    DFSUtil(v, visited);
+}
+
+void Graph::DFSUtil(int v, vector<bool>& visited) {
+    visited[v] = true;
+    cout << v << " ";
+    
+    for (auto i = adj[v].begin(); i != adj[v].end(); ++i)
+        if (!visited[*i])
+            DFSUtil(*i, visited);
+}
+
+// BFS
+void Graph::BFS(int v) {
+    vector<bool> visited(V, false);
+    list<int> queue;
+    
+    visited[v] = true;
+    queue.push_back(v);
+    
+    while (!queue.empty()) {
+        v = queue.front();
+        cout << v << " ";
+        queue.pop_front();
+        
+        for (auto i = adj[v].begin(); i != adj[v].end(); ++i)
+            if (!visited[*i]) {
+                visited[*i] = true;
+                queue.push_back(*i);
+            }
+    }
+}
+
+// Пример использования
+int main() {
+    Graph g(4);
+    g.addEdge(0, 1);
+    g.addEdge(0, 2);
+    g.addEdge(1, 2);
+    g.addEdge(2, 0);
+    g.addEdge(2, 3);
+    g.addEdge(3, 3);
+    
+    cout << "DFS: ";
+    g.DFS(2);
+    cout << endl;
+    
+    cout << "BFS: ";
+    g.BFS(2);
+    cout << endl;
+    
+    return 0;
+}
+
+
+2 пример кода для реализации графов (с использованием матрицы смежности)
+
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <limits>
+
+using namespace std;
+
+// Класс для представления взвешенного графа
+class WeightedGraph {
+private:
+    int V; // Количество вершин
+    vector<vector<int>> adjMatrix; // Матрица смежности
+
+public:
+    // Конструктор
+    WeightedGraph(int V);
+    
+    // Добавление ребра с весом
+    void addEdge(int u, int v, int weight);
+    
+    // Вывод матрицы смежности
+    void printMatrix();
+    
+    // Алгоритм Дейкстры для поиска кратчайшего пути
+    void dijkstra(int start);
+    
+    // Проверка наличия ребра между вершинами
+    bool hasEdge(int u, int v);
+};
+
+// Конструктор
+WeightedGraph::WeightedGraph(int V) {
+    this->V = V;
+    adjMatrix = vector<vector<int>>(V, vector<int>(V, 0));
+}
+
+// Добавление ребра с весом
+void WeightedGraph::addEdge(int u, int v, int weight) {
+    if (u >= 0 && u < V && v >= 0 && v < V) {
+        adjMatrix[u][v] = weight;
+        // Для неориентированного графа раскомментируйте следующую строку
+        // adjMatrix[v][u] = weight;
+    }
+}
+
+// Вывод матрицы смежности
+void WeightedGraph::printMatrix() {
+    cout << "Матрица смежности:" << endl;
+    for (int i = 0; i < V; i++) {
+        for (int j = 0; j < V; j++) {
+            cout << adjMatrix[i][j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+// Алгоритм Дейкстры
+void WeightedGraph::dijkstra(int start) {
+    vector<int> dist(V, numeric_limits<int>::max());
+    vector<bool> visited(V, false);
+    dist[start] = 0;
+    
+    for (int count = 0; count < V - 1; count++) {
+        int u = -1;
+        for (int i = 0; i < V; i++) {
+            if (!visited[i] && (u == -1 || dist[i] < dist[u])) {
+                u = i;
+            }
+        }
+        
+        visited[u] = true;
+        
+        for (int v = 0; v < V; v++) {
+            if (adjMatrix[u][v] != 0 && !visited[v]) {
+                if (dist[v] > dist[u] + adjMatrix[u][v]) {
+                    dist[v] = dist[u] + adjMatrix[u][v];
+                }
+            }
+        }
+    }
+    
+    cout << "Кратчайшие пути от вершины " << start << ":" << endl;
+    for (int i = 0; i < V; i++) {
+        cout << "До вершины " << i << ": " << dist[i] << endl;
+    }
+}
+
+// Проверка наличия ребра
+bool WeightedGraph::hasEdge(int u, int v) {
+    return adjMatrix[u][v] != 0;
+}
+
+// Пример использования
+int main() {
+    WeightedGraph g(5);
+    
+    g.addEdge(0, 1, 2);
+    g.addEdge(0, 3, 6);
+    g.addEdge(1, 2, 3);
+    g.addEdge(1, 3, 8);
+    g.addEdge(1, 4, 5);
+    g.addEdge(2, 4, 7);
+    g.addEdge(3, 4, 9);
+    
+    g.printMatrix();
+    
+    cout << "\nПроверка наличия ребра между 0 и 1: " << g.hasEdge(0, 1) << endl;
+    cout << "Проверка наличия ребра между 0 и 2: " << g.hasEdge(0, 2) << endl;
+    
+    cout << "\nЗапуск алгоритма Дейкстры от вершины 0:" << endl;
+
+
+Java | Бинарные кучи
+
+1 пример кода для реализации графов
+
+// Класс для представления ребра графа
+class Edge {
+    int source;
+    int destination;
+    int weight; // для взвешенного графа
+
+    public Edge(int source, int destination, int weight) {
+        this.source = source;
+        this.destination = destination;
+        this.weight = weight;
+    }
+}
+
+// Основной класс для представления графа
+class Graph {
+    private int vertices; // количество вершин
+    private LinkedList<Edge>[] adjacencyList;
+
+    public Graph(int vertices) {
+        this.vertices = vertices;
+        adjacencyList = new LinkedList[vertices];
+        for (int i = 0; i < vertices; i++) {
+            adjacencyList[i] = new LinkedList<>();
+        }
+    }
+
+    // Добавление ребра в граф
+    public void addEdge(int source, int destination, int weight) {
+        Edge edge = new Edge(source, destination, weight);
+        adjacencyList[source].add(edge);
+        
+        // Для неориентированного графа раскомментируйте следующую строку
+        // adjacencyList[destination].add(new Edge(destination, source, weight));
+    }
+
+    // Вывод графа
+    public void printGraph() {
+        for (int i = 0; i < vertices; i++) {
+            System.out.print("Вершина " + i + ": ");
+            for (Edge edge : adjacencyList[i]) {
+                System.out.print(" -> (" + edge.destination + ", вес: " + edge.weight + ")");
+            }
+            System.out.println();
+        }
+    }
+}
+
+// Пример использования
+public class Main {
+    public static void main(String[] args) {
+        Graph graph = new Graph(5);
+        
+        graph.addEdge(0, 1, 10);
+        graph.addEdge(0, 4, 20);
+        graph.addEdge(1, 2, 30);
+        graph.addEdge(1, 3, 40);
+        graph.addEdge(1, 4, 50);
+        graph.addEdge(2, 3, 60);
+        graph.addEdge(3, 4, 70);
+        
+        graph.printGraph();
+    }
+}
+
+
+2 пример кода для реализации графов
+
+// Реализация графа с использованием матрицы смежности
+public class GraphMatrix {
+    private int vertices;    // количество вершин
+    private int[][] matrix;  // матрица смежности
+    
+    // Конструктор
+    public GraphMatrix(int vertices) {
+        this.vertices = vertices;
+        // Инициализация матрицы
+        matrix = new int[vertices][vertices];
+        // Заполняем матрицу нулями
+        for (int i = 0; i < vertices; i++) {
+            for (int j = 0; j < vertices; j++) {
+                matrix[i][j] = 0;
+            }
+        }
+    }
+    
+    // Добавление ребра в граф
+    public void addEdge(int source, int destination, int weight) {
+        if (source >= vertices || destination >= vertices) {
+            System.out.println("Ошибка: неверные индексы вершин");
+            return;
+        }
+        matrix[source][destination] = weight;
+        // Для неориентированного графа
+        matrix[destination][source] = weight;
+    }
+    
+    // Удаление ребра из графа
+    public void removeEdge(int source, int destination) {
+        if (source >= vertices || destination >= vertices) {
+            System.out.println("Ошибка: неверные индексы вершин");
+            return;
+        }
+        matrix[source][destination] = 0;
+        matrix[destination][source] = 0;
+    }
+    
+    // Проверка наличия ребра
+    public boolean hasEdge(int source, int destination) {
+        return matrix[source][destination] != 0;
+    }
+    
+    // Получение веса ребра
+    public int getEdgeWeight(int source, int destination) {
+        return matrix[source][destination];
+    }
+    
+    // Вывод матрицы смежности
+    public void printMatrix() {
+        System.out.println("Матрица смежности:");
+        for (int i = 0; i < vertices; i++) {
+            for (int j = 0; j < vertices; j++) {
+                System.out.print(matrix[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+    
+    // Пример использования
+    public static void main(String[] args) {
+        GraphMatrix graph = new GraphMatrix(5);
+        
+        // Добавление рёбер
+        graph.addEdge(0, 1, 10);
+        graph.addEdge(0, 4, 20);
+        graph.addEdge(1, 2, 30);
+        graph.addEdge(1, 3, 40);
+        graph.addEdge(2, 3, 50);
+        
+        // Вывод матрицы
+        graph.printMatrix();
+        
+        // Проверка наличия ребра
+        System.out.println("Есть ли ребро между 0 и 1? " + graph.hasEdge(0, 1));
+        
+        // Получение веса ребра
+        System.out.println("Вес ребра между 1 и 2: " + graph.getEdgeWeight(1, 2));
+        
+        // Удаление ребра
+        graph.removeEdge(0, 1);
+        graph.printMatrix();
+    }
+}
+
+
+
+ 
+
